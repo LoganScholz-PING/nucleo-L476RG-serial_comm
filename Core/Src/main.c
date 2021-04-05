@@ -70,7 +70,8 @@ int main(void)
   //uint32_t time1 = HAL_GetTick();
   uint32_t debounce = HAL_GetTick();
 //  uint32_t delta = 0;
-  uint8_t testString[] = "blue\n";
+  uint8_t txString[] = "blue1234567890red1234567823132132132132132132132190\r\n";
+  uint8_t rxString[] = "";
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -100,28 +101,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    // below code sends serial data 1 time
-    /*
-	if ( complete == false )
+	// GPIO_PIN_13 "reset" when pressed down
+    if ( (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET) && ((HAL_GetTick() - debounce) > 250))
     {
-    	HAL_UART_Transmit(&huart2, testString, sizeof(testString), 10);
-    	complete = true;
-    }
-    */
-
-    if ( (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == !GPIO_PIN_SET) && ((HAL_GetTick() - debounce) > 250))
-    {
-    	HAL_UART_Transmit(&huart2, testString, sizeof(testString), 10);
-
-    	// ///////////////////////////////////////////////////////////////////
-    	// TODO: Figure out how to get the uint32_t size variable to print
-    	// to serial using the HAL_UART_Transmit() function which expects
-    	// a uint8_t (char*) size variable
-//    	delta = HAL_GetTick() - debounce;
-//    	delta = (uint8_t)delta;
-//    	HAL_UART_Transmit(&huart2, delta, sizeof(delta), 10);
-    	// ///////////////////////////////////////////////////////////////////
-    	//
+    	HAL_UART_Transmit(&huart2, txString, sizeof(txString), 0xFFFF);
 
     	debounce = HAL_GetTick();
     }
@@ -130,10 +113,16 @@ int main(void)
     /*
 	  if ((HAL_GetTick() - time1) > 1500)
     {
-    	HAL_UART_Transmit(&huart2, testString, sizeof(testString), 10);
+    	HAL_UART_Transmit(&huart2, txString, sizeof(txString), 0xFFFF);
     	time1 = HAL_GetTick();
     }
     */
+
+//    rxString[0] = "";
+//    HAL_UART_Receive(&huart2, rxString, sizeof(rxString), 20);
+//
+//    HAL_UART_Transmit(&huart2, rxString, sizeof(rxString), 0xFFFF);
+
 
     /* USER CODE END WHILE */
 
