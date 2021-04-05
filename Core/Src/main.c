@@ -66,12 +66,14 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-//  bool complete = false;
-  //uint32_t time1 = HAL_GetTick();
+//  bool complete = false; // state control variable
   uint32_t debounce = HAL_GetTick();
-//  uint32_t delta = 0;
   uint8_t txString[] = "blue1234567890red1234567823132132132132132132132190\r\n";
-  uint8_t rxString[] = "";
+  uint8_t rx_Data[10] = ""; //  10 byte wide receive buffer for serial data
+
+  // initialize the receive buffer empty because there could be junk in it from a reset
+  rx_Data[0] = '\0';
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -101,11 +103,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	// GPIO_PIN_13 "reset" when pressed down
-    if ( (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET) && ((HAL_GetTick() - debounce) > 250))
+	// GPIO_PIN_13 is considered "reset" when pressed down
+    if ( (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_RESET) && ((HAL_GetTick() - debounce) > 150))
     {
     	HAL_UART_Transmit(&huart2, txString, sizeof(txString), 0xFFFF);
-
     	debounce = HAL_GetTick();
     }
 
@@ -118,15 +119,30 @@ int main(void)
     }
     */
 
-//    rxString[0] = "";
-//    HAL_UART_Receive(&huart2, rxString, sizeof(rxString), 20);
-//
-//    HAL_UART_Transmit(&huart2, rxString, sizeof(rxString), 0xFFFF);
+    HAL_UART_Receive(&huart2, rx_Data, sizeof(rx_Data), 20);
 
+    if (rx_Data[0] == 'a')
+    {
+    	// send an 'a' character to toggle ON the built-in LED
+    	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+    }
+    else if (rx_Data[0] == 'b')
+    {
+    	// send a 'b' character to toggle OFF the built-in LED
+    	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+    }
+
+    // loop-back the received character buffer for learning purposes
+    HAL_UART_Transmit(&huart2, rx_Data, sizeof(rx_Data), 0xFFFF);
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    // \0 is the null character for a character array (aka string), all characters after \0
+    // in a character array are ignored, even though they do still exist if you could physically
+    // access the memory still
+    // -= the operation below essentially "clears" out the character array =-
+    rx_Data[0] = '\0';
   }
   /* USER CODE END 3 */
 }
