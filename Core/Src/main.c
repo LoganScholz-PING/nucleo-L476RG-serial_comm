@@ -66,10 +66,10 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-  bool complete = false;
+//  bool complete = false;
   //uint32_t time1 = HAL_GetTick();
   uint32_t debounce = HAL_GetTick();
-  uint32_t delta = 0;
+//  uint32_t delta = 0;
   uint8_t testString[] = "blue\n";
   /* USER CODE END 1 */
 
@@ -117,9 +117,9 @@ int main(void)
     	// TODO: Figure out how to get the uint32_t size variable to print
     	// to serial using the HAL_UART_Transmit() function which expects
     	// a uint8_t (char*) size variable
-    	delta = HAL_GetTick() - debounce;
-    	delta = (uint8_t)delta;
-    	HAL_UART_Transmit(&huart2, delta, sizeof(delta), 10);
+//    	delta = HAL_GetTick() - debounce;
+//    	delta = (uint8_t)delta;
+//    	HAL_UART_Transmit(&huart2, delta, sizeof(delta), 10);
     	// ///////////////////////////////////////////////////////////////////
     	//
 
